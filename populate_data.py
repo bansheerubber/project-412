@@ -8,13 +8,15 @@ try:
                                   database="covid_data")
    cursor = connection.cursor()
    
-   place_id = 3
-   name = "Random"
+   fips_id = 3
+   name = "'random'"
    population = 2
 
    postgres_insert_query = """INSERT INTO Place (
-	fips, name, population) VALUES ({}, {}, {})""".format(place_id, name, population)
+       Fips, Name, Population) VALUES ({}, {}, {})""".format(fips_id, name, population)
+   
    cursor.execute(postgres_insert_query)
+
 
    connection.commit()
    count = cursor.rowcount

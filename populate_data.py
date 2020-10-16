@@ -75,6 +75,8 @@ try:
          except:
             pass
 
+
+   fips_to_place_id = {}
    # do states before counties
    state_to_sql_id = {}
    for fips in fips_array:
@@ -89,6 +91,7 @@ try:
             (fips, state, population)
          )
          place_id = int(cursor.fetchone()[0])
+         fips_to_place_id[fips] = place_id
 
          cursor.execute('INSERT INTO State (Place_id) VALUES (%s) RETURNING State_id;', (place_id,))
          state_to_sql_id[state] = cursor.fetchone()[0]
@@ -107,11 +110,33 @@ try:
             (fips, name, population)
          )
          place_id = cursor.fetchone()[0]
+         fips_to_place_id[fips] = place_id
 
          cursor.execute(
             'INSERT INTO County (State_id, Place_id) VALUES (%s, %s);',
             (state_to_sql_id[state], place_id)
          )
+   
+   # governors
+   with open('./governors.csv') as file:
+      file.readline() # read header
+      while True:
+         try:
+            line = file.readline()
+            if not line:
+               break
+
+            split = line.split(',')
+            state = split[0].strip()
+            supports_masks = int(split[7]) == 1
+            person_name = split[8].strip()
+
+            cursor.execute(
+               'INSERT INTO Governor (State_id, Name, Pro_mask) VALUES (%s, %s, %s);',
+               (state_to_sql_id[state], person_name, supports_masks)
+            )
+         except:
+            pass
 
    connection.commit()
    count = cursor.rowcount

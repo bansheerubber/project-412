@@ -1,21 +1,22 @@
 CREATE DATABASE covid_data;
 
 CREATE TABLE Place (
-	Place_id INTEGER,
+	Place_id SERIAL,
+	Fips INTEGER,
 	Name CHAR(40),
 	Population INTEGER,
 	PRIMARY KEY(Place_id)
 );
 
 CREATE TABLE State (
-	State_id INTEGER,
+	State_id SERIAL,
 	Place_id INTEGER,
 	PRIMARY KEY(State_id),
 	FOREIGN KEY(Place_id) REFERENCES Place
 );
 
 CREATE TABLE Governor (
-	Gov_id INTEGER,
+	Gov_id SERIAL,
 	State_id INTEGER,
 	Name CHAR(40),
 	Pro_mask BOOLEAN,
@@ -24,7 +25,7 @@ CREATE TABLE Governor (
 );
 
 CREATE TABLE County (
-	County_id INTEGER,
+	County_id SERIAL,
 	State_id INTEGER,
 	Place_id INTEGER,
 	PRIMARY KEY(County_id),
@@ -33,7 +34,7 @@ CREATE TABLE County (
 );
 
 CREATE TABLE District (
-	District_id INTEGER,
+	District_id SERIAL,
 	County_id INTEGER,
 	Place_id INTEGER,
 	PRIMARY KEY(District_id),
@@ -41,7 +42,7 @@ CREATE TABLE District (
 );
 
 CREATE TABLE Business (
-	Business_id INTEGER,
+	Business_id SERIAL,
 	Place_id INTEGER,
 	Name CHAR(40),
 	Closed BOOLEAN,

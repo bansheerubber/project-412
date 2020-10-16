@@ -12,8 +12,8 @@ try:
    name = "Random"
    population = 2
 
-   postgres_insert_query = """ INSERT INTO Place (
-	place_id, name, population) VALUES ({}, {}, {})""".format(place_id, name, population)
+   postgres_insert_query = """INSERT INTO Place (
+	fips, name, population) VALUES ({}, {}, {})""".format(place_id, name, population)
    cursor.execute(postgres_insert_query)
 
    connection.commit()

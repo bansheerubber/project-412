@@ -62,8 +62,8 @@ CREATE TABLE Status (
 CREATE TABLE Mask_Data (
 	Place_id INTEGER,
 	Rarely FLOAT,
-	Never FLOAT,
-	Always FLOAT,
+	_Never FLOAT,
+	_Always FLOAT,
 	Sometimes FLOAT,
 	Frequently FLOAT,
 	PRIMARY KEY (Place_id),

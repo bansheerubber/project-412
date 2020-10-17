@@ -4,7 +4,9 @@ import random
 
 connection = None
 try:
-   connection = psycopg2.connect(user="justi",
+   role = open('role.txt').readline()
+
+   connection = psycopg2.connect(user=role,
                                   password="root",
                                   host="localhost",
                                   port="5432",
@@ -73,6 +75,7 @@ try:
    county = {}
    # do states before counties
    state_to_sql_id = {}
+   print("inserting states...")
    for fips in fips_array:
       if is_county_table[fips] == False:
          state = fips_name_table[fips]
@@ -92,6 +95,7 @@ try:
 
 
    # go through every single FIPS and figure out what to do with it
+   print("inserting counties...")
    for fips in fips_array:
       if is_county_table[fips]: # dealing with county
          name, state = fips_name_table[fips]
@@ -119,6 +123,7 @@ try:
          )
 
    # governors
+   print("inserting governors...")
    with open('./governors.csv') as file:
       file.readline() # read header
       while True:
@@ -142,6 +147,7 @@ try:
    connection.commit()
 
    # business
+   print("inserting companies...")
    with open('./Companies.csv') as file:
       file.readline() # read header
       while True:
@@ -160,7 +166,6 @@ try:
                'INSERT INTO Business (Place_id, Name, Closed) VALUES (%s, %s, %s) RETURNING Business_id;',
                (place_id_ran, company_name, is_closed)
             )
-            connection.commit()
          except:
             pass
     
@@ -168,6 +173,7 @@ try:
    connection.commit()
    
    # mask_data for county
+   print("mask use by county...")
    with open('./mask-use-by-county.csv') as file:
       file.readline() # read header
       while True:
@@ -189,11 +195,13 @@ try:
                'INSERT INTO Mask_Data (Place_id, _Never, Rarely, Sometimes, Frequently, _Always) VALUES (%s, %s, %s, %s, %s, %s) ;',
                (place_id, never, rarely, sometimes, frequently, always)
             )
-            connection.commit()
          except:
             pass
    
+   connection.commit()
+
    # calculate mask_data for states
+   print("mask use by states...")
    for x in range(51):
        if x !=0:
            cursor.execute(
@@ -233,6 +241,7 @@ try:
             )
 
    # status for states
+   print("inserting status for states...")
    with open('./us-states.csv') as file:
       file.readline() # read header
       while True:
@@ -250,11 +259,13 @@ try:
                'INSERT INTO Status (Place_id, Date, Deaths, Cases) VALUES (%s, %s, %s, %s);',
                (place_id, date, deaths, cases)
             )
-            connection.commit()
          except:
             pass
    
+   connection.commit()
+
    # status for counties
+   print("inserting status for counties...")
    with open('./us-counties.csv') as file:
       file.readline() # read header
       while True:
@@ -274,7 +285,6 @@ try:
                'INSERT INTO Status (Place_id, Date, Deaths, Cases) VALUES (%s, %s, %s, %s);',
                (place_id, date, deaths, cases)
             )
-            connection.commit()
          except:
             pass
    

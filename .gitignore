@@ -1,1 +1,6 @@
 role.txt
+node_modules
+yarn.lock
+package.lock
+bundle.min*
+server/templates/index.html

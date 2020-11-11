@@ -85,7 +85,7 @@ try:
          population = fips_to_population[state]
          cursor.execute(
             'INSERT INTO Place (Fips, Name, Population) VALUES (%s, %s, %s) RETURNING Place_id;',
-            (fips, state, population)
+            (fips, state.strip(), population)
          )
          place_id = int(cursor.fetchone()[0])
          fips_to_place_id[fips] = place_id
@@ -105,7 +105,7 @@ try:
          population = fips_to_population[(name, state)]
          cursor.execute(
             'INSERT INTO Place (Fips, Name, Population) VALUES (%s, %s, %s) RETURNING Place_id;',
-            (fips, name, population)
+            (fips, name.strip(), population)
          )
          place_id = cursor.fetchone()[0]
          fips_to_place_id[fips] = place_id

@@ -4,7 +4,7 @@ import random
 
 connection = None
 try:
-   role = open('role.txt').readline()
+   role = open('role.txt').readline().strip()
 
    connection = psycopg2.connect(user=role,
                                   password="root",

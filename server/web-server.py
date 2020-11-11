@@ -7,7 +7,7 @@ import json
 app = Flask(__name__)
 
 def create_db_connection():
-	role = open('../role.txt').readline()
+	role = open('../role.txt').readline().strip()
 	connection = psycopg2.connect(
 		user=role,
 		password="root",

@@ -21,13 +21,64 @@ def create_db_connection():
 def index():
   return render_template("index.html")
 
-@app.route('/states-map')
-def states_map():
+@app.route('/states-map/<data_type>/<date>')
+def states_map(data_type, date):
 	connection = create_db_connection()
 	cursor = connection.cursor()
+	
+	data = []
+	if data_type == "cases":
+		cursor.execute(
+			"""SELECT p.Name, s.Cases FROM Status s
+			JOIN Place p ON s.Place_id = p.Place_id
+			JOIN State st ON p.Place_id = st.Place_id
+			WHERE Date = %s;""",
+			[date]
+		)
+		data = cursor.fetchall()
+	else:
+		cursor.execute(
+			"""SELECT p.Name, s.Deaths FROM Status s
+			JOIN Place p ON s.Place_id = p.Place_id
+			JOIN State st ON p.Place_id = st.Place_id
+			WHERE Date = %s;""",
+			[date]
+		)
+		data = cursor.fetchall()
 
-	cursor.execute("""SELECT p.Name, s.Cases FROM Status s JOIN Place p ON s.Place_id = p.Place_id JOIN State st ON p.Place_id = st.Place_id WHERE Date = '2020-09-22';""")
-	data = cursor.fetchall()
+	return json.dumps({datum[0].strip(): int(datum[1]) for datum in data})
+
+@app.route('/counties/<state>/<data_type>/<date>')
+def counties(state, data_type, date):
+	connection = create_db_connection()
+	cursor = connection.cursor()
+	
+	data = []
+	if data_type == "cases":
+		cursor.execute(
+			"""SELECT p.Name, s.Cases FROM Status s
+			JOIN Place p ON s.Place_id = p.Place_id
+			JOIN County c ON p.Place_id = c.Place_id
+			JOIN State st ON c.State_id = st.State_id
+			JOIN Place p2 ON st.Place_id = p2.Place_id
+			WHERE p2.Name = %s AND Date = %s
+			ORDER BY s.Deaths DESC;""",
+			[state, date]
+		)
+		data = cursor.fetchall()
+	else:
+		cursor.execute(
+			"""SELECT p.Name, s.Deaths FROM Status s
+			JOIN Place p ON s.Place_id = p.Place_id
+			JOIN County c ON p.Place_id = c.Place_id
+			JOIN State st ON c.State_id = st.State_id
+			JOIN Place p2 ON st.Place_id = p2.Place_id
+			WHERE p2.Name = %s AND Date = %s
+			ORDER BY s.Deaths DESC;""",
+			[state, date]
+		)
+		data = cursor.fetchall()
+	
 	return json.dumps({datum[0].strip(): int(datum[1]) for datum in data})
 
 if __name__ == '__main__':

@@ -13,6 +13,15 @@ module.exports = {
 	resolve: {
 		extensions: [".js", ".jsx", ".json"],
 	},
+	module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: ['babel-loader'],
+      },
+    ],
+  },
 	output: {
 		path: path.resolve(__dirname, "../server/templates/"),
 		filename: "../static/js/bundle.min.js",

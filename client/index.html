@@ -4,17 +4,50 @@
 		<script src="https://d3js.org/d3.v3.min.js"></script>
 
 		<style>
-			#map-graph {
+			.map-graph-container {
 				display: flex;
-    		justify-content: center;
+				justify-content: center;
 				flex-direction: column;
 				align-items: center;
+			}
+
+			.dual-button button:first-child {
+				border-radius: 0;
+				border-top-left-radius: 5px;
+				border-bottom-left-radius: 5px;
+
+				border: 1px solid black;
+				border-right: 0;
+			}
+
+			.dual-button button:last-child {
+				border-radius: 0;
+				border-top-right-radius: 5px;
+				border-bottom-right-radius: 5px;
+
+				border: 1px solid black;
+			}
+
+			.dual-button button.active {
+				background-color: #6ca7ff;
+			}
+
+			.dual-button button:active {
+				outline: 0 !important;
+				background-color: #AAA;
+			}
+
+			.dual-button button:focus {
+				outline: 0 !important;
+			}
+
+			.container {
+				width: 60%;
+				margin: auto;
 			}
 		</style>
 	</head>
 	<body>
-		<div id="map-graph">
-			<h2>COVID-19 Cases Per state</h2>
-		</div>
+		<div id="react-container"></div>
 	</body>
 </html>

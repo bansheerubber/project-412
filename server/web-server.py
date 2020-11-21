@@ -79,7 +79,7 @@ def counties(state, data_type, date):
 		)
 		data = cursor.fetchall()
 	
-	return json.dumps({datum[0].strip(): int(datum[1]) for datum in data})
+	return json.dumps([{"county": datum[0].strip(), "amount": int(datum[1])} for datum in data])
 
 if __name__ == '__main__':
 	handler = logging.StreamHandler()

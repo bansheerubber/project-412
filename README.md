@@ -7,6 +7,7 @@ Run `python populate_data.py` to populate the database with data from the variou
 
 # Setting Up Webserver
 
+Run `yarn global add webpack webpack-cli`, and then close and reopen the command line.  
 In a commmand line, run `pip install -r requirements.txt`, and then run `yarn install`.  
 To build the client, `cd ./client` and then run `webpack`.  
 To start the server, `cd ./server` and then run `python web-server.py`. Make sure you have a working database before this.  

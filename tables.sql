@@ -44,9 +44,10 @@ CREATE TABLE District (
 CREATE TABLE Business (
 	Business_id SERIAL,
 	Place_id INTEGER,
+	Date DATE,
 	Name CHAR(40),
 	Closed BOOLEAN,
-	PRIMARY KEY(Business_id),
+	PRIMARY KEY(Business_id, Date),
 	FOREIGN KEY(Place_id) REFERENCES Place
 );
 

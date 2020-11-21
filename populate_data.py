@@ -1,12 +1,13 @@
 import psycopg2
 import re
 import random
+import datetime
 
 connection = None
 try:
    role = open('role.txt').readline().strip()
 
-   connection = psycopg2.connect(user=role,
+   connection = psycopg2.connect(user="justi",
                                   password="root",
                                   host="localhost",
                                   port="5432",
@@ -162,9 +163,14 @@ try:
             place_id_ran = fips_to_place_id[temp_id_ran]
             is_closed = (random.randint(0, 1)) == 1
 
+            start_data = datetime.date(2020, 2, 22)
+            end_data = datetime.date(2020, 10, 8)
+            time_diff = end_data - start_data
+            random_date = start_data + datetime.timedelta(days=random.randrange(time_diff.days))
+
             cursor.execute(
-               'INSERT INTO Business (Place_id, Name, Closed) VALUES (%s, %s, %s) RETURNING Business_id;',
-               (place_id_ran, company_name, is_closed)
+               'INSERT INTO Business (Place_id, Date, Name, Closed) VALUES (%s, %s, %s, %s) RETURNING Business_id;',
+               (place_id_ran, random_date, company_name, is_closed)
             )
          except:
             pass

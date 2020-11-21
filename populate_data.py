@@ -7,7 +7,7 @@ connection = None
 try:
    role = open('role.txt').readline().strip()
 
-   connection = psycopg2.connect(user="justi",
+   connection = psycopg2.connect(user=role,
                                   password="root",
                                   host="localhost",
                                   port="5432",

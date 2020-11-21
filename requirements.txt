@@ -1,4 +1,2 @@
 flask
 psycopg2
-logging
-json

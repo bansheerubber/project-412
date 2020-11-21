@@ -62,7 +62,7 @@ def counties(state, data_type, date):
 			JOIN State st ON c.State_id = st.State_id
 			JOIN Place p2 ON st.Place_id = p2.Place_id
 			WHERE p2.Name = %s AND Date = %s
-			ORDER BY s.Deaths DESC;""",
+			ORDER BY s.Cases DESC;""",
 			[state, date]
 		)
 		data = cursor.fetchall()
@@ -79,7 +79,7 @@ def counties(state, data_type, date):
 		)
 		data = cursor.fetchall()
 	
-	return json.dumps([{"county": datum[0].strip(), "amount": int(datum[1])} for datum in data])
+	return json.dumps([{"key": data.index(datum), "county": datum[0].strip(), "amount": int(datum[1])} for datum in data])
 
 if __name__ == '__main__':
 	handler = logging.StreamHandler()

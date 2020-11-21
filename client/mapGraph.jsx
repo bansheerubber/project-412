@@ -58,6 +58,10 @@ export default class MapGraph extends React.Component {
 				.attr("width", width)
 				.attr("height", height)
 			
+			let tooltip = d3.select("body").append("div")
+				.attr("class", "tooltip")
+				.style("opacity", 0)
+			
 			let data = JSON.parse(request.response)
 			let maxDeaths = 0
 			d3.json("./static/us-states.json", json => {
@@ -67,6 +71,7 @@ export default class MapGraph extends React.Component {
 					for(let j = 0; j < json.features.length; j++) {
 						if(state == json.features[j].properties.name) {
 							json.features[j].properties.value = deaths
+							json.features[j].value = deaths
 							maxDeaths = Math.max(deaths, maxDeaths)
 							break
 						}
@@ -81,12 +86,25 @@ export default class MapGraph extends React.Component {
 					.attr("d", path)
 					.style("stroke", "#fff")
 					.style("stroke-width", "1")
-					.style("fill", function (d) {
+					.style("fill", (d) => {
 						var value = d.properties.value || 0
 						return d3.scale.linear()
 							.range(["rgb(220, 220, 220)", "rgb(230, 18, 18)"])
 							.domain([0, maxDeaths])(value)
 					})
+					.on("mouseover", (d) => {
+						tooltip.transition()
+							.duration(200)
+							.style("opacity", .9)
+						tooltip.html(`${d.properties.name}<br />${d.properties.value || 0} ${this.state.selectedType.toLowerCase()}`)
+							.style("left", (d3.event.pageX) + "px")
+							.style("top", (d3.event.pageY - 28) + "px")
+					})
+					.on("mouseout", function(d) {		
+						tooltip.transition()
+							.duration(500)
+							.style("opacity", 0);
+					});
 			})
 		}
 		request.send()

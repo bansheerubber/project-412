@@ -304,11 +304,19 @@ export default class MapGraph extends React.Component {
 			}
 		
 		};
-		return <div class="map-graph-container">
+		return <div>
 			<Row gutter={32}>
 			<Col>
-			<Switch checkedChildren="Deaths" unCheckedChildren="Cases" onClick={OnButtonClick} />
-					<h2>COVID-19 {this.state.selectedType} per State on {this.state.selectedDate}</h2>
+				<div class="map-graph-container">
+					<div style={{
+						display: "flex",
+						alignItems: "center",
+					}}>
+						<h2 style={{
+							paddingRight: 10,
+						}}>COVID-19 {this.state.selectedType} per State on {this.state.selectedDate}</h2>
+						<Switch checkedChildren="Deaths" unCheckedChildren="Cases" onClick={OnButtonClick} />
+					</div>
 					<div id="map-graph"></div>
 					<input
 						type="range"
@@ -358,6 +366,7 @@ export default class MapGraph extends React.Component {
 							}}
 						/>
 					</div>
+				</div>
 			</Col>
 			<Col style={{
 				marginTop: 50,

@@ -29,7 +29,7 @@ def states_map(data_type, date):
 	data = []
 	if data_type == "cases":
 		cursor.execute(
-			"""SELECT p.Name, s.Cases FROM Status s
+			"""SELECT p.Name, s.Cases, p.Population FROM Status s
 			JOIN Place p ON s.Place_id = p.Place_id
 			JOIN State st ON p.Place_id = st.Place_id
 			WHERE Date = %s;""",
@@ -38,7 +38,7 @@ def states_map(data_type, date):
 		data = cursor.fetchall()
 	else:
 		cursor.execute(
-			"""SELECT p.Name, s.Deaths FROM Status s
+			"""SELECT p.Name, s.Deaths, p.Population FROM Status s
 			JOIN Place p ON s.Place_id = p.Place_id
 			JOIN State st ON p.Place_id = st.Place_id
 			WHERE Date = %s;""",
@@ -46,7 +46,7 @@ def states_map(data_type, date):
 		)
 		data = cursor.fetchall()
 
-	return json.dumps({datum[0].strip(): int(datum[1]) for datum in data})
+	return json.dumps({datum[0].strip(): (int(datum[1]), int(datum[2])) for datum in data})
 
 @app.route('/counties/<state>/<data_type>/<date>')
 def counties(state, data_type, date):

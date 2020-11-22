@@ -4,3 +4,4 @@ yarn.lock
 package.lock
 bundle.min*
 server/templates/index.html
+nickcreate.bat

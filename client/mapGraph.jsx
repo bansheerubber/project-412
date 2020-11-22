@@ -1,6 +1,8 @@
+import { Col, Row } from "antd"
 import * as React from "react"
 import DualButton from "./dualButton"
 import CountiesTable from "./countiesTable"
+
 
 /*
 	state type: {
@@ -120,6 +122,8 @@ export default class MapGraph extends React.Component {
 
 	render() {
 		return <div class="map-graph-container">
+			<Row gutter={32}>
+			<Col>
 			<DualButton
 				button1Name={"Cases"}
 				button1OnClick={
@@ -164,12 +168,16 @@ export default class MapGraph extends React.Component {
 					}
 				}
 			/>
-			<hr />
-			<CountiesTable
-				state={"Nevada"}
-				dataType={this.state.selectedType}
-				date={this.state.selectedDate}
-			/>
+			<hr /> 
+			</Col>
+			<Col>
+				<CountiesTable
+					state={"Washington"}
+					dataType={this.state.selectedType}
+					date={this.state.selectedDate}
+				/>
+			</Col>
+			</Row>
 		</div>
 	}
 }

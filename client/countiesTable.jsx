@@ -1,4 +1,5 @@
-import * as React from "react"
+import * as React from "react";
+import { Table, Col, Row} from 'antd';
 
 /*
 props type: {
@@ -7,6 +8,21 @@ props type: {
 	date: string (in MYSQL format)
 }
 */
+const columns = [
+
+	{
+		title: "County",
+		dataIndex:"county",
+		key: "county",
+	},
+
+	{
+		title: dataType,
+		dataIndex:"amount",
+		key: "amount",
+	},
+
+];
 export default class CountiesTable extends React.Component {
 	constructor(props) {
 		super(props)
@@ -77,8 +93,8 @@ export default class CountiesTable extends React.Component {
 			</tr>
 		)
 		
-		return <table>
-			{data}
-		</table>
+		return (
+			<Table size={"middle"} columns={columns} dataSource={this.state.data} />
+		);
 	}
 }

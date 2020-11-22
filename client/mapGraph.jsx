@@ -26,6 +26,39 @@ const columns = [
 
 ];
 
+const countyColumns = [
+	{
+		title: "Always",
+		dataIndex: "value",
+		key: "value"
+	},
+	
+	{
+		title: "Frequently",
+		dataIndex: "value",
+		key: "value"
+	},
+
+	{
+		title: "Sometimes",
+		dataIndex: "value",
+		key: "value"
+	},
+
+	{
+		title: "Rarely",
+		dataIndex: "value",
+		key: "value"
+	},
+
+	{
+		title: "Never",
+		dataIndex: "value",
+		key: "value"
+	},
+
+];
+
 const { option } = Select;
 
 export default class MapGraph extends React.Component {
@@ -43,6 +76,8 @@ export default class MapGraph extends React.Component {
 			nationalMaskMandate: "Yes",
 			visible1: false,
 			visible2: false,
+			county1: null,
+			county2: null,
 		}
 
 		this.lastSelectedType = ""
@@ -359,6 +394,18 @@ export default class MapGraph extends React.Component {
 			this.setState({ visible2: false });
 		};
 
+		const onCounty1Change = value => {
+			this.setState({
+			  county1: value,
+			});
+		  };
+
+		const onCounty2Change = value => {
+			this.setState({
+			  county2: value,
+			});
+		  };
+
 		return <div>
 			<Row gutter={32}>
 				<Col>
@@ -519,18 +566,60 @@ export default class MapGraph extends React.Component {
 				</div>
 			</Modal>
 
-			<Button type="primary" onClick={showModal2}>
-				State Based Covid-19 Statistics
+			<Button type="secondary" className="button-secondary" onClick={showModal2}>
+			{`${this.state.selectedUSState} covid-19 statistics`}
       </Button>
 			<Modal
 				destroyOnClose={true}
-				title="National Covid-19 Statistics"
+				title={`${this.state.selectedUSState} covid-19 statistics`}
 				visible={this.state.visible2}
 				width={1000}
 				onOk={handleOk2}
 				onCancel={handleCancel2}
 			>
 				<div className="site-card-wrapper">
+					<Row gutter={16}>
+						<Col style={{
+							margin: "auto",
+						}}>
+						<Card title={`${this.state.selectedUSState} County Comparison Tool`}>
+							<Row gutter={16}>
+								<Col span={12}>
+									<Select placeholder="County 1" onChange={onCounty1Change}>
+									{this.state.countyList.map(d => (
+          								<Option key={d}>{d}</Option>
+        							))}
+									</Select>
+								</Col>
+								<Col span={12}>
+									<Select placeholder="County 2" onChange={onCounty2Change}>
+										{this.state.countyList.map(d => (
+          								<Option key={d}>{d}</Option>
+        								))}
+									</Select>
+								</Col>
+							</Row>
+							<Row gutter={16}>
+								<Col span={12}>
+									<div className="label">Cases: </div>
+									<div className="label">Deaths: </div>
+								</Col>
+								<Col span={12}>
+									<div className="label">Cases: </div>
+									<div className="label">Deaths: </div>
+								</Col>
+							<Row gutter={16}>
+								<Col span={12}>
+									<Table size={"small"} columns={countyColumns}/>
+								</Col>
+								<Col span={14}>
+									<Table size={"small"} columns={countyColumns}/>
+								</Col>
+							</Row>
+						</Row>
+						</Card>
+						</Col>
+					</Row>
 					<Row gutter={16}>
 						<Col span={12}>
 							<Card title={`${this.state.selectedUSState} Status Breakdown`} bordered={true} >

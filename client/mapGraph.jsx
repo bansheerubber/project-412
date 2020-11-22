@@ -1,4 +1,4 @@
-import { Col, Row, Card, Table, Input, Select, Divider, Switch } from "antd"
+import { Col, Row, Card, Table, Input, Select, Divider, Switch, Button, Modal } from "antd"
 import * as React from "react"
 import DualButton from "./dualButton"
 import CountiesTable from "./countiesTable"
@@ -40,6 +40,8 @@ export default class MapGraph extends React.Component {
 			sliderValue: 0,
 			playing: false,
 			selectedUSState: "Arizona",
+			visible1: false,
+			visible2: false,
 		}
 
 		this.lastSelectedType = ""
@@ -304,6 +306,34 @@ export default class MapGraph extends React.Component {
 			}
 		
 		};
+		const showModal1 = () => {
+			this.setState({
+			  visible1: true,
+			});
+		  };
+		const showModal2 = () => {
+			this.setState({
+			  visible2: true,
+			});
+		  };
+		const handleOk1 = e => {
+			console.log(e);
+			this.setState({
+			  visible1: false,
+			});
+		  };
+		const handleCancel1 = () => {
+			this.setState({ visible1: false });
+		  };
+		const handleOk2 = e => {
+			console.log(e);
+			this.setState({
+			  visible2: false,
+			});
+		  };
+		const handleCancel2 = () => {
+			this.setState({ visible2: false });
+		  };
 		return <div>
 			<Row gutter={32}>
 			<Col>
@@ -378,7 +408,18 @@ export default class MapGraph extends React.Component {
 				/>
 			</Col>
 			</Row>
-			<div className="site-card-wrapper">
+			<Button type="primary" onClick={showModal1} style={}>
+          		National Covid Statistics
+        	</Button>
+        	<Modal
+				  destroyOnClose={true}
+				  title="National Covid-19 Statistics"
+				  visible={this.state.visible1}
+				  width={1000}
+				  onOk={handleOk1}
+				  onCancel={handleCancel1}
+        	>
+          		<div className="site-card-wrapper">
     			<Row gutter={16}>
       				<Col span={12}>
         				<Card title="National Status Breakdown" bordered={true} >
@@ -405,7 +446,7 @@ export default class MapGraph extends React.Component {
         				</Card>
       				</Col>
 				</Row>
-  			</div>
+				<Divider orientation="left"></Divider>
 			  <Card title="Status Breakdown based on State Mask Mandates">
 							<Select defaultValue="Yes">
                         		<Option value="Yes">Mask Mandate</Option>
@@ -414,7 +455,39 @@ export default class MapGraph extends React.Component {
 							<div className="label">Deaths: </div>
 							<div className="label">Cases: </div>
 							<div className="label">Percentage of Frequent Mask Usage: </div>
-						</Card>
+			   </Card>
+			   </div>
+        	</Modal>
+
+			<Button type="primary" onClick={showModal2}>
+          		State Based Covid-19 Statistics
+        	</Button>
+        	<Modal
+				  destroyOnClose={true}
+				  title="National Covid-19 Statistics"
+				  visible={this.state.visible2}
+				  width={1000}
+				  onOk={handleOk2}
+				  onCancel={handleCancel2}
+        	>
+          		<div className="site-card-wrapper">
+    			<Row gutter={16}>
+      				<Col span={12}>
+        				<Card title={`${this.state.selectedUSState} Status Breakdown`} bordered={true} >
+							<div className="label">State Population: </div>
+							<div className="label">Deaths: </div>
+							<div className="label">Cases: </div>
+        				</Card>
+      				</Col>
+      				<Col span={12}>
+       					<Card title={`${this.state.selectedUSState} Mask Use Breakdown`} bordered={true}>
+						   <div className="label">Percentage of People who Regularly Wear Masks:  </div>
+        				</Card>
+      				</Col>
+    			</Row>
+			   </div>
+        	</Modal>
+			
 		</div>
 	}
 }

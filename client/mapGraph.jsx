@@ -157,6 +157,8 @@ export default class MapGraph extends React.Component {
 				countyList: json,
 			})
 		})
+
+		this.getState()
 	}
 
 	// based on http://bl.ocks.org/michellechandra/0b2ce4923dc9b5809922

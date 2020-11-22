@@ -164,7 +164,7 @@ export default class MapGraph extends React.Component {
 		this.lastSelectedType = this.state.selectedType
 		this.lastSelectedDate = this.state.selectedDate
 
-		requestBackend(`/states-map/${this.state.selectedType.toLowerCase()}/${this.state.selectedDate}`).then((data) => {
+		requestBackend(`./states-map/${this.state.selectedType.toLowerCase()}/${this.state.selectedDate}`).then((data) => {
 			let maxPercent = 0
 			for(let key in data) {
 				let [
@@ -380,7 +380,7 @@ export default class MapGraph extends React.Component {
 					<div>
 						<img
 							className="play-button"
-							src={this.state.playing ? "/static/pause.svg" : "/static/play.svg"}
+							src={this.state.playing ? "./static/pause.svg" : "./static/play.svg"}
 							onClick={() => {
 								let newState = !this.state.playing
 								this.setState({

@@ -59,7 +59,7 @@ export default class CountiesTable extends React.Component {
 	}
 	
 	query() {
-		requestBackend(`/counties/${this.props.state}/${this.props.dataType.toLowerCase()}/${this.props.date}`).then((json) => {
+		requestBackend(`./counties/${this.props.state}/${this.props.dataType.toLowerCase()}/${this.props.date}`).then((json) => {
 			this.setState({
 				data: json,
 			})

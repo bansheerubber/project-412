@@ -17,7 +17,7 @@ const columns = [
 	},
 
 	{
-		title: dataType,
+		title: "Placeholder",
 		dataIndex:"amount",
 		key: "amount",
 	},

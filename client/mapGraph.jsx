@@ -1,4 +1,4 @@
-import { Col, Row } from "antd"
+import { Col, Row, Card, Table, Input, Select, Divider, Switch } from "antd"
 import * as React from "react"
 import DualButton from "./dualButton"
 import CountiesTable from "./countiesTable"
@@ -9,6 +9,26 @@ import CountiesTable from "./countiesTable"
 		selectedType: "Cases" | "Deaths"
 	}
 */
+const columns = [
+
+	{
+		title: "State",
+		dataIndex:"state",
+		key: "state",
+	},
+
+	{
+		title: "Mask Mandate",
+		dataIndex:"mask",
+		key: "mask",
+	},
+
+];
+
+const { option } = Select;
+
+
+
 export default class MapGraph extends React.Component {
 	constructor(props) {
 		super(props)
@@ -22,6 +42,7 @@ export default class MapGraph extends React.Component {
 		this.lastSelectedType = ""
 		this.lastSelectedDate = ""
 	}
+	
 
 	// based on http://bl.ocks.org/michellechandra/0b2ce4923dc9b5809922
 	renderGraph() {
@@ -121,23 +142,25 @@ export default class MapGraph extends React.Component {
 	}
 
 	render() {
+		const OnButtonClick  = () => {
+			if(this.state.selectedType == "Cases")
+			{
+				this.setState({
+					selectedType: "Deaths"
+				});
+			}
+			else
+			{
+				this.setState({
+					selectedType: "Cases"
+				});
+			}
+		
+		};
 		return <div class="map-graph-container">
 			<Row gutter={32}>
 			<Col>
-			<DualButton
-				button1Name={"Cases"}
-				button1OnClick={
-					event => this.setState({
-						selectedType: "Cases"
-					})
-				}
-				button2Name={"Deaths"}
-				button2OnClick={
-					event => this.setState({
-						selectedType: "Deaths"
-					})
-				}
-			/>
+			<Switch checkedChildren="Deaths" unCheckedChildren="Cases" onClick={OnButtonClick} />
 			<h2>COVID-19 {this.state.selectedType} per State on {this.state.selectedDate}</h2>
 			<div id="map-graph"></div>
 			<input
@@ -178,6 +201,43 @@ export default class MapGraph extends React.Component {
 				/>
 			</Col>
 			</Row>
+			<div className="site-card-wrapper">
+    			<Row gutter={16}>
+      				<Col span={12}>
+        				<Card title="National Status Breakdown" bordered={true} >
+          					<div className="label">Deaths: </div>
+							<div className="label">Cases: </div>
+        				</Card>
+      				</Col>
+      				<Col span={12}>
+       					<Card title="Regular Mask Usage of U.S." bordered={true}>
+						   <div className="label">Percentage of People who Regularly Wear Masks:  </div>
+        				</Card>
+      				</Col>
+    			</Row>
+				<Divider orientation="left"></Divider>
+				<Row gutter={16}>
+					<Col span={12}>
+        				<Card title="Status of Mask Mandates as of July" bordered={true}>
+							<Table size={"small"} columns={columns} dataSource={this.state.data} />
+        				</Card>
+      				</Col>
+					<Col span={12}>
+       					<Card title="Total Business Closures in U.S." bordered={true}>
+						   <div className="label">Closures:  </div>
+        				</Card>
+      				</Col>
+				</Row>
+  			</div>
+			  <Card title="Status Breakdown based on State Mask Mandates">
+							<Select defaultValue="Yes">
+                        		<Option value="Yes">Mask Mandate</Option>
+                        		<Option value="No">No Mask Mandate</Option>
+                    		</Select>
+							<div className="label">Deaths: </div>
+							<div className="label">Cases: </div>
+							<div className="label">Percentage of Frequent Mask Usage: </div>
+						</Card>
 		</div>
 	}
 }

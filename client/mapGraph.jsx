@@ -28,8 +28,6 @@ const columns = [
 
 const { option } = Select;
 
-
-
 export default class MapGraph extends React.Component {
 	constructor(props) {
 		super(props)
@@ -451,10 +449,22 @@ export default class MapGraph extends React.Component {
 			>
 				<div className="site-card-wrapper">
 					<Row gutter={16}>
-						<Col span={12}>
+						<Col span={12} style={{
+							margin: "auto",
+						}}>
 							<Card title="National Status Breakdown" bordered={true} >
 								<div className="data-label">{this.state.nationalStats.deaths || 0} deaths</div>
 								<div className="data-label">{this.state.nationalStats.cases || 0} cases</div>
+							</Card>
+						</Col>
+					</Row>
+
+					<Divider orientation="left"></Divider>
+
+					<Row gutter={16}>
+						<Col span={12}>
+							<Card title="Total Business Closures in U.S." bordered={true}>
+								<div className="data-label">{this.state.nationalStats.closedBusinesses || 0} business closures</div>
 							</Card>
 						</Col>
 
@@ -483,16 +493,6 @@ export default class MapGraph extends React.Component {
 							</Card>
 						</Col>
 
-						<Col span={12}>
-							<Card title="Total Business Closures in U.S." bordered={true}>
-								<div className="data-label">{this.state.nationalStats.closedBusinesses || 0} business closures</div>
-							</Card>
-						</Col>
-					</Row>
-
-					<Divider orientation="left"></Divider>
-
-					<Row gutter={16}>
 						<Col span={12}>
 							<Card title="Status Breakdown based on State Mask Mandates">
 								<div className="data-label">{this.state.nationalStats[this.state.nationalMaskMandate == "Yes" ? "proMaskDeaths" : "antiMaskDeaths"] || 0} deaths</div>

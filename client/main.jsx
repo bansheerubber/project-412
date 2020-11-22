@@ -7,4 +7,3 @@ ReactDOM.render(<div className="container">
 </div>, document.getElementById("react-container"))
 
 require("./mapGraph")
-

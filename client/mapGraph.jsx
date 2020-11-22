@@ -658,13 +658,13 @@ export default class MapGraph extends React.Component {
 					<Row gutter={16}>
 						<Col span={12}>
 							<Card title={`Total Business Closures in ${this.state.selectedUSState}`} bordered={true}>
-								<div className="data-label">{this.state.nationalStats.closedBusinesses || 0} business closures</div>
+								<div className="data-label">{this.state.usStateStats.businessesClosed || 0} business closures</div>
 							</Card>
 						</Col>
 						<Col span={12}>
 							<Card title={"Governor Information"}>
-								<div className="data-label">{`${this.state.selectedUSState} Governor: `} </div>
-								<div className="data-label">{"Mask Mandate in Place? "} </div>
+								<div className="data-label">{`${this.state.selectedUSState} Governor: ${this.state.usStateStats.governorName} `} </div>
+								<div className="data-label">{`Mask Mandate in Place? ${this.state.usStateStats.proMask}`} </div>
 							</Card>
 						</Col>
 					</Row>

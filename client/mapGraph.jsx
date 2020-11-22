@@ -29,32 +29,32 @@ const columns = [
 const countyColumns = [
 	{
 		title: "Always",
-		dataIndex: "value",
-		key: "value"
+		dataIndex: "always",
+		key: "always"
 	},
-	
+
 	{
 		title: "Frequently",
-		dataIndex: "value",
-		key: "value"
+		dataIndex: "frequently",
+		key: "frequently"
 	},
 
 	{
 		title: "Sometimes",
-		dataIndex: "value",
-		key: "value"
+		dataIndex: "sometimes",
+		key: "sometimes"
 	},
 
 	{
 		title: "Rarely",
-		dataIndex: "value",
-		key: "value"
+		dataIndex: "rarely",
+		key: "rarely"
 	},
 
 	{
 		title: "Never",
-		dataIndex: "value",
-		key: "value"
+		dataIndex: "never",
+		key: "never"
 	},
 
 ];
@@ -72,6 +72,8 @@ export default class MapGraph extends React.Component {
 			playing: false,
 			selectedUSState: "Arizona",
 			nationalStats: {}, // hello global state
+			county1Stats: {},
+			county2Stats: {},
 			usStateStats: {}, // stats for the selected US state
 			countyList: [], // list of counties for the currently selected state
 			nationalMaskMandate: "Yes",
@@ -170,16 +172,18 @@ export default class MapGraph extends React.Component {
 				return "#fff"
 			}
 		}).style("stroke-width", (d) => {
-				if (d.properties.name == name) {
-					return "2"
-				}
-				else {
-					return "1"
-				}
-			})
+			if (d.properties.name == name) {
+				return "2"
+			}
+			else {
+				return "1"
+			}
+		})
 
 		this.setState({
 			selectedUSState: name,
+			county1: null,
+			county2: null,
 		})
 
 		this.nodes.sort((a, b) => {
@@ -223,38 +227,38 @@ export default class MapGraph extends React.Component {
 						.range(["rgb(220, 220, 220)", "rgb(245, 222, 12)", "rgb(230, 130, 18)", "rgb(230, 18, 18)"])
 						.domain([0, maxPercent / 3 + 0.000001, maxPercent * 2 / 3 + 0.000002, maxPercent + 0.000003])(percent)
 				}).on("mouseover", (d) => {
-						let datum = data[d.properties.name]
-						let value = datum ? datum[0] : 0
-						let population = datum ? datum[1] : 1
+					let datum = data[d.properties.name]
+					let value = datum ? datum[0] : 0
+					let population = datum ? datum[1] : 1
 
-						let oneInHowMany = ""
-						if (value > 0) {
-							oneInHowMany = `<br />1 in every ${Math.floor(population / value).toLocaleString()} residents`
-						}
+					let oneInHowMany = ""
+					if (value > 0) {
+						oneInHowMany = `<br />1 in every ${Math.floor(population / value).toLocaleString()} residents`
+					}
 
-						this.tooltip.transition()
-							.duration(200)
-							.style("opacity", .9)
+					this.tooltip.transition()
+						.duration(200)
+						.style("opacity", .9)
 
-						this.tooltip.html(`${d.properties.name}<br />${value.toLocaleString()} ${this.state.selectedType.toLowerCase()}${oneInHowMany}`)
-							.style("left", (d3.event.pageX) + "px")
-							.style("top", (d3.event.pageY - 28) + "px")
+					this.tooltip.html(`${d.properties.name}<br />${value.toLocaleString()} ${this.state.selectedType.toLowerCase()}${oneInHowMany}`)
+						.style("left", (d3.event.pageX) + "px")
+						.style("top", (d3.event.pageY - 28) + "px")
 
-						this.hoveredState = d
-					}).on("mousemove", (d) => {
-						this.tooltip.style("left", (d3.event.pageX) + "px")
-							.style("top", (d3.event.pageY - 28) + "px")
+					this.hoveredState = d
+				}).on("mousemove", (d) => {
+					this.tooltip.style("left", (d3.event.pageX) + "px")
+						.style("top", (d3.event.pageY - 28) + "px")
 
-						this.hoveredState = d
-					}).on("mouseout", (d) => {
-						this.tooltip.transition()
-							.duration(500)
-							.style("opacity", 0)
+					this.hoveredState = d
+				}).on("mouseout", (d) => {
+					this.tooltip.transition()
+						.duration(500)
+						.style("opacity", 0)
 
-						this.hoveredState = null
-					}).on("mousedown", (d) => {
-						this.selectState(d.properties.name)
-					})
+					this.hoveredState = null
+				}).on("mousedown", (d) => {
+					this.selectState(d.properties.name)
+				})
 
 				if (this.hoveredState) {
 					let datum = data[this.hoveredState.properties.name]
@@ -288,20 +292,52 @@ export default class MapGraph extends React.Component {
 
 	componentDidUpdate() {
 		if (
-			this.lastSelectedType == this.state.selectedType
-			&& this.lastSelectedDate == this.state.selectedDate
+			this.lastSelectedType != this.state.selectedType
+			|| this.lastSelectedDate != this.state.selectedDate
 		) {
-			return
+			this.lastSelectedType = this.state.selectedType
+			this.lastSelectedDate = this.state.selectedDate
+
+			this.renderGraph()
+
+			// we need to update the national stats since they are reliant on date
+			this.getNational()
+			this.getState()
 		}
 
-		this.lastSelectedType = this.state.selectedType
-		this.lastSelectedDate = this.state.selectedDate
+		if(this.lastCounty1 != this.state.county1) {
+			this.lastCounty1 = this.state.county1
 
-		this.renderGraph()
+			if(this.state.county1) {
+				requestBackend(`/county-compare/${this.state.selectedUSState}/${this.state.county1.trim()}/${this.state.selectedDate}`).then((json) => {
+					this.setState({
+						county1Stats: json,
+					})
+				})
+			}
+			else {
+				this.setState({
+					county1Stats: {},
+				})
+			}
+		}
 
-		// we need to update the national stats since they are reliant on date
-		this.getNational()
-		this.getState()
+		if(this.lastCounty2 != this.state.county2) {
+			this.lastCounty2 = this.state.county2
+
+			if(this.state.county2) {
+				requestBackend(`/county-compare/${this.state.selectedUSState}/${this.state.county2.trim()}/${this.state.selectedDate}`).then((json) => {
+					this.setState({
+						county2Stats: json,
+					})
+				})
+			}
+			else {
+				this.setState({
+					county2Stats: {},
+				})
+			}
+		}
 	}
 
 	getNational() {
@@ -311,7 +347,7 @@ export default class MapGraph extends React.Component {
 			})
 		})
 	}
-	
+
 	getState() {
 		requestBackend(`/state/${this.state.selectedUSState}/${this.state.selectedDate}`).then((json) => {
 			this.setState({
@@ -409,16 +445,17 @@ export default class MapGraph extends React.Component {
 		};
 
 		const onCounty1Change = value => {
+			console.log(value)
 			this.setState({
-			  county1: value,
+				county1: value,
 			});
-		  };
+		};
 
 		const onCounty2Change = value => {
 			this.setState({
-			  county2: value,
+				county2: value,
 			});
-		  };
+		};
 
 		return <div>
 			<Row gutter={32}>
@@ -496,10 +533,20 @@ export default class MapGraph extends React.Component {
 				</Col>
 			</Row>
 			
-			<Button type="primary" onClick={showModal1}>
-				National Covid Statistics
-      </Button>
-		
+			<div style={{
+				display: "flex",
+				justifyContent: "center",
+				marginTop: 50,
+			}}>
+				<Button type="primary" onClick={showModal1}>
+					National Covid Statistics
+				</Button>
+
+				<Button type="secondary" className="button-secondary" onClick={showModal2}>
+					{`${this.state.selectedUSState} covid-19 statistics`}
+				</Button>
+			</div>
+
 			<Modal
 				destroyOnClose={true}
 				title="National Covid-19 Statistics"
@@ -580,9 +627,6 @@ export default class MapGraph extends React.Component {
 				</div>
 			</Modal>
 
-			<Button type="secondary" className="button-secondary" onClick={showModal2}>
-			{`${this.state.selectedUSState} covid-19 statistics`}
-      </Button>
 			<Modal
 				destroyOnClose={true}
 				title={`${this.state.selectedUSState} covid-19 statistics`}
@@ -596,42 +640,42 @@ export default class MapGraph extends React.Component {
 						<Col style={{
 							margin: "auto",
 						}}>
-						<Card title={`${this.state.selectedUSState} County Comparison Tool`}>
-							<Row gutter={16}>
-								<Col span={12}>
-									<Select placeholder="County 1" onChange={onCounty1Change}>
-									{this.state.countyList.map(d => (
-          								<Option key={d}>{d}</Option>
-        							))}
-									</Select>
-								</Col>
-								<Col span={12}>
-									<Select placeholder="County 2" onChange={onCounty2Change}>
-										{this.state.countyList.map(d => (
-          								<Option key={d}>{d}</Option>
-        								))}
-									</Select>
-								</Col>
-							</Row>
-							<Row gutter={16}>
-								<Col span={12}>
-									<div className="label">Cases: </div>
-									<div className="label">Deaths: </div>
-								</Col>
-								<Col span={12}>
-									<div className="label">Cases: </div>
-									<div className="label">Deaths: </div>
-								</Col>
-							<Row gutter={64}>
-								<Col span={12}>
-									<Table size={"small"} columns={countyColumns}/>
-								</Col>
-								<Col span={12}>
-									<Table size={"small"} columns={countyColumns}/>
-								</Col>
-							</Row>
-						</Row>
-						</Card>
+							<Card title={`${this.state.selectedUSState} County Comparison Tool`}>
+								<Row gutter={16}>
+									<Col span={12}>
+										<Select placeholder="County 1" value={this.state.county1} onChange={onCounty1Change} style={{width: "100%"}}>
+											{this.state.countyList.map(d => (
+												<Option key={d}>{d}</Option>
+											))}
+										</Select>
+									</Col>
+									<Col span={12}>
+										<Select placeholder="County 2" value={this.state.county2} onChange={onCounty2Change} style={{width: "100%"}}>
+											{this.state.countyList.map(d => (
+												<Option key={d}>{d}</Option>
+											))}
+										</Select>
+									</Col>
+								</Row>
+								<Row gutter={16}>
+									<Col span={12}>
+										<div className="data-label">{this.state.county1Stats.deaths || 0} deaths</div>
+										<div className="data-label">{this.state.county1Stats.cases || 0} cases</div>
+									</Col>
+									<Col span={12}>
+										<div className="data-label">{this.state.county2Stats.deaths || 0} deaths</div>
+										<div className="data-label">{this.state.county2Stats.cases || 0} cases</div>
+									</Col>
+									<div style={{
+										width: "100%",
+										display: "flex",
+										justifyContent: "space-evenly",
+									}}>
+										<Table size={"small"} columns={countyColumns} dataSource={this.state.county1Stats.maskData} pagination={false} />
+										<Table size={"small"} columns={countyColumns} dataSource={this.state.county2Stats.maskData} pagination={false} />
+									</div>
+								</Row>
+							</Card>
 						</Col>
 					</Row>
 
@@ -640,7 +684,7 @@ export default class MapGraph extends React.Component {
 					<Row gutter={16}>
 						<Col span={12}>
 							<Card title={`${this.state.selectedUSState} Status Breakdown`} bordered={true} >
-							<div className="data-label">{this.state.usStateStats.population || 0} residents</div>
+								<div className="data-label">{this.state.usStateStats.population || 0} residents</div>
 								<div className="data-label">{this.state.usStateStats.deaths || 0} deaths</div>
 								<div className="data-label">{this.state.usStateStats.cases || 0} cases</div>
 							</Card>
@@ -648,7 +692,7 @@ export default class MapGraph extends React.Component {
 
 						<Col span={12}>
 							<Card title={`${this.state.selectedUSState} Mask Use Breakdown`} bordered={true}>
-								<Table size={"small"} columns={countyColumns}/>
+								<Table size={"small"} columns={countyColumns} dataSource={this.state.usStateStats.maskData} pagination={false} />
 							</Card>
 						</Col>
 					</Row>
@@ -663,8 +707,9 @@ export default class MapGraph extends React.Component {
 						</Col>
 						<Col span={12}>
 							<Card title={"Governor Information"}>
-								<div className="data-label">{`${this.state.selectedUSState} Governor: ${this.state.usStateStats.governorName} `} </div>
-								<div className="data-label">{`Mask Mandate in Place? ${this.state.usStateStats.proMask}`} </div>
+								<div className="data-label">{this.state.usStateStats.governorName}</div>
+								<hr />
+								<div className="data-label">{this.state.usStateStats.proMask ? "Supports masks" : "Doesn't support masks"} </div>
 							</Card>
 						</Col>
 					</Row>

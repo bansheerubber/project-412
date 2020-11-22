@@ -108,25 +108,40 @@ def county_compare(state, county, date):
 	big = {}
 
 	cursor.execute(
-		"""SELECT st.Cases, st.Deaths, md._Never, md.Rarely, md.Sometimes, md.Frequently, md._Always FROM Mask_Data md
+		"""SELECT s.Cases, s.Deaths FROM Status s
+		JOIN Place p ON s.Place_id = p.Place_id
+		JOIN County c ON c.Place_id = p.Place_id
+		JOIN State st ON c.State_id = c.State_id
+		JOIN Place p2 ON st.Place_id = p2.Place_id
+		WHERE s.Date = %s
+		AND p.Name = %s
+		AND p2.Name = %s
+		""",
+		[date, county, state]
+	)
+	data = cursor.fetchone()
+	big["cases"] = "{:,}".format(data[0] if data else 0)
+	big["deaths"] = "{:,}".format(data[1] if data else 0)
+
+	cursor.execute(
+		"""SELECT md._Never, md.Rarely, md.Sometimes, md.Frequently, md._Always FROM Mask_Data md
 		JOIN Place p ON md.Place_id = p.Place_id
 		JOIN County c ON p.Place_id = c.Place_id
 		JOIN State s ON c.State_id = s.State_id
 		JOIN Place p2 ON p2.Place_id = s.Place_id
-		JOIN Status st ON st.Place_id = c.Place_id
 		WHERE p.Name = %s
-		AND p2.Name = %s
-		AND st.Date = %s;""",
-		[county, state, date]
+		AND p2.Name = %s;""",
+		[county, state]
 	)
 	data = cursor.fetchone()
-	big["cases"] = "{:,}".format(data[0] * 100)
-	big["deaths"] = "{:,}".format(data[1] * 100)
-	big["never"] = "{:.1f}%".format(data[2] * 100)
-	big["rarely"] = "{:.1f}%".format(data[3] * 100)
-	big["sometimes"] = "{:.1f}%".format(data[4] * 100)
-	big["frequently"] = "{:.1f}%".format(data[5] * 100)
-	big["always"] = "{:.1f}%".format(data[6] * 100)
+
+	big["maskData"] = [{
+		"never": "{:.1f}%".format(data[0] * 100),
+		"rarely": "{:.1f}%".format(data[1] * 100),
+		"sometimes": "{:.1f}%".format(data[2] * 100),
+		"frequently": "{:.1f}%".format(data[3] * 100),
+		"always": "{:.1f}%".format(data[4] * 100),
+	}]
 	
 	return json.dumps(big)
 
@@ -176,11 +191,13 @@ def state(state, date):
 		[state]
 	)
 	data = cursor.fetchone()
-	big["maskUsageNever"] = "{:.1f}%".format(float(data[0]) * 100)
-	big["maskUsageRarely"] = "{:.1f}%".format(float(data[1]) * 100)
-	big["maskUsageSometimes"] = "{:.1f}%".format(float(data[2]) * 100)
-	big["maskUsageFrequently"] = "{:.1f}%".format(float(data[3]) * 100)
-	big["maskUsageAlways"] = "{:.1f}%".format(float(data[4]) * 100)
+	big["maskData"] = [{
+		"never": "{:.1f}%".format(data[0] * 100),
+		"rarely": "{:.1f}%".format(data[1] * 100),
+		"sometimes": "{:.1f}%".format(data[2] * 100),
+		"frequently": "{:.1f}%".format(data[3] * 100),
+		"always": "{:.1f}%".format(data[4] * 100),
+	}]
 
 	cursor.execute(
 		"""SELECT Governor.Name, Governor.Pro_mask 

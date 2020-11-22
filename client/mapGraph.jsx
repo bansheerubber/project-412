@@ -56,7 +56,8 @@ export default class MapGraph extends React.Component {
 				.attr("width", width)
 				.attr("height", height)
 			
-			this.tooltip = d3.select("body").append("div")
+			this.tooltip = d3.select("body")
+				.append("div")
 				.attr("class", "tooltip")
 				.style("opacity", 0)
 			
@@ -71,6 +72,31 @@ export default class MapGraph extends React.Component {
 					.style("stroke-width", "1")
 					.style("fill", "rgb(220, 220, 220)")
 				
+				let color = d3.scale.linear().range(["rgb(220, 220, 220)", "rgb(245, 222, 12)", "rgb(230, 130, 18)", "rgb(230, 18, 18)"]).domain([1, 2, 3, 4])
+				let legend = d3.select("body")
+					.select("#map-graph")
+					.append("svg")
+					.attr("class", "legend")
+					.attr("width", 140)
+					.attr("height", 200)
+					.selectAll("g")
+					.data(color.domain().slice().reverse())
+					.enter()
+					.append("g")
+					.attr("transform", (d, i) => "translate(0," + i * 20 + ")");
+
+				legend.append("circle")
+					.attr("r", 5)
+					.style("fill", color)
+					.attr("transform", (d, i) => "translate(10, 10)");
+
+				legend.append("text")
+					.data(["Heavy cases", "Moderate cases", "Mild cases", "No cases"])
+					.attr("x", 20)
+					.attr("y", 10)
+					.attr("dy", ".35em")
+					.text(function(d) { return d; });
+						
 				resolve()
 			})
 		})

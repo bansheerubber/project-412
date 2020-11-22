@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Table, Col, Row} from 'antd';
+import requestBackend from "./requestBackend"
 
 /*
 props type: {
@@ -58,16 +59,11 @@ export default class CountiesTable extends React.Component {
 	}
 	
 	query() {
-		let request = new XMLHttpRequest()
-		request.open("GET", `/counties/${this.props.state}/${this.props.dataType.toLowerCase()}/${this.props.date}`, true)
-		request.responseType = "text"
-
-		request.onload = (event) => {
+		requestBackend(`/counties/${this.props.state}/${this.props.dataType.toLowerCase()}/${this.props.date}`).then((json) => {
 			this.setState({
-				data: JSON.parse(request.response),
+				data: json,
 			})
-		}
-		request.send()
+		})
 	}
 	
 	render() {
@@ -94,7 +90,19 @@ export default class CountiesTable extends React.Component {
 		)
 		
 		return (
-			<Table size={"middle"} columns={columns} dataSource={this.state.data} />
+			<Table
+				size={"middle"}
+				columns={[{
+					title: "County",
+					dataIndex:"county",
+					key: "county",
+				}, {
+					title: this.props.dataType,
+					dataIndex: "amount",
+					key: "amount",
+				}]}
+				dataSource={this.state.data}
+			/>
 		);
 	}
 }

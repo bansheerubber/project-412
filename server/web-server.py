@@ -138,21 +138,32 @@ def state(state, date):
 	big = {}
 	
 	cursor.execute(
-		"""SELECT SUM(Deaths), SUM(Cases), p.Population FROM Status s
+		"""SELECT p.Population FROM Place p
+		WHERE p.Name = %s;""",
+		[state]
+	)
+	population = cursor.fetchone()[0]
+
+	cursor.execute(
+		"""SELECT s.Deaths, s.Cases FROM Status s
 		JOIN State st ON s.Place_id = st.Place_id
 		JOIN Place p ON s.Place_id = p.Place_id
 		WHERE Date = %s
-		AND p.Name = %s
-		GROUP BY p.Place_id;""",
+		AND p.Name = %s;""",
 		[date, state]
 	)
 	data = cursor.fetchone()
-	deaths = data[0]
-	cases = data[1]
-	population = data[2]
+	deaths = data[0] if data else 0
+	cases = data[1] if data else 0
 
-	big["deathsInPopulation"] = "1 in {:,} residents".format(math.floor(population / deaths))
-	big["casesInPopulation"] = "1 in {:,} residents".format(math.floor(population / cases))
+	if deaths != 0 and cases != 0:
+		big["deathsInPopulation"] = "1 in {:,} residents".format(math.floor(population / deaths))
+		big["casesInPopulation"] = "1 in {:,} residents".format(math.floor(population / cases))
+	else:
+		big["deathsInPopulation"] = "0 in {:,} residents".format(population)
+		big["casesInPopulation"] = "0 in {:,} residents".format(population)
+
+	big["population"] = "{:,}".format(population)
 	big["deaths"] = "{:,}".format(deaths)
 	big["cases"] = "{:,}".format(cases)
 

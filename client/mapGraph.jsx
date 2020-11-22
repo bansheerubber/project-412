@@ -72,6 +72,7 @@ export default class MapGraph extends React.Component {
 			playing: false,
 			selectedUSState: "Arizona",
 			nationalStats: {}, // hello global state
+			usStateStats: {}, // stats for the selected US state
 			countyList: [], // list of counties for the currently selected state
 			nationalMaskMandate: "Yes",
 			visible1: false,
@@ -168,8 +169,7 @@ export default class MapGraph extends React.Component {
 			else {
 				return "#fff"
 			}
-		})
-			.style("stroke-width", (d) => {
+		}).style("stroke-width", (d) => {
 				if (d.properties.name == name) {
 					return "2"
 				}
@@ -182,43 +182,82 @@ export default class MapGraph extends React.Component {
 			selectedUSState: name,
 		})
 
+		this.nodes.sort((a, b) => {
+			return a.properties.name != name ? -1 : 1
+		})
+
 		// query counties list
 		requestBackend(`/counties-list/${name}`).then((json) => {
 			this.setState({
 				countyList: json,
 			})
-
-			console.log(json)
 		})
+
+		this.getState()
 	}
 
 	// based on http://bl.ocks.org/michellechandra/0b2ce4923dc9b5809922
 	renderGraph() {
-		// if we update the range while we're playing, just don't query at all
-		if (this.state.playing && this.rangeDateSet) {
-			return
-		}
-
-		requestBackend(`./states-map/${this.state.selectedType.toLowerCase()}/${this.state.selectedDate}`).then((data) => {
-			let maxPercent = 0
-			for (let key in data) {
-				let [
-					value,
-					population
-				] = data[key]
-				maxPercent = Math.max(value / population, maxPercent)
+		return new Promise((resolve, reject) => {
+			// if we update the range while we're playing, just don't query at all
+			if (this.state.playing && this.rangeDateSet) {
+				return
 			}
 
-			this.nodes.style("fill", (d) => {
-				let datum = data[d.properties.name]
-				let value = datum ? datum[0] : 0
-				let population = datum ? datum[1] : 1
-				let percent = value / population
-				return d3.scale.linear()
-					.range(["rgb(220, 220, 220)", "rgb(245, 222, 12)", "rgb(230, 130, 18)", "rgb(230, 18, 18)"])
-					.domain([0, maxPercent / 3 + 0.000001, maxPercent * 2 / 3 + 0.000002, maxPercent + 0.000003])(percent)
-			}).on("mouseover", (d) => {
+			requestBackend(`./states-map/${this.state.selectedType.toLowerCase()}/${this.state.selectedDate}`).then((data) => {
+				let maxPercent = 0
+				for (let key in data) {
+					let [
+						value,
+						population
+					] = data[key]
+					maxPercent = Math.max(value / population, maxPercent)
+				}
+
+				this.nodes.style("fill", (d) => {
 					let datum = data[d.properties.name]
+					let value = datum ? datum[0] : 0
+					let population = datum ? datum[1] : 1
+					let percent = value / population
+					return d3.scale.linear()
+						.range(["rgb(220, 220, 220)", "rgb(245, 222, 12)", "rgb(230, 130, 18)", "rgb(230, 18, 18)"])
+						.domain([0, maxPercent / 3 + 0.000001, maxPercent * 2 / 3 + 0.000002, maxPercent + 0.000003])(percent)
+				}).on("mouseover", (d) => {
+						let datum = data[d.properties.name]
+						let value = datum ? datum[0] : 0
+						let population = datum ? datum[1] : 1
+
+						let oneInHowMany = ""
+						if (value > 0) {
+							oneInHowMany = `<br />1 in every ${Math.floor(population / value).toLocaleString()} residents`
+						}
+
+						this.tooltip.transition()
+							.duration(200)
+							.style("opacity", .9)
+
+						this.tooltip.html(`${d.properties.name}<br />${value.toLocaleString()} ${this.state.selectedType.toLowerCase()}${oneInHowMany}`)
+							.style("left", (d3.event.pageX) + "px")
+							.style("top", (d3.event.pageY - 28) + "px")
+
+						this.hoveredState = d
+					}).on("mousemove", (d) => {
+						this.tooltip.style("left", (d3.event.pageX) + "px")
+							.style("top", (d3.event.pageY - 28) + "px")
+
+						this.hoveredState = d
+					}).on("mouseout", (d) => {
+						this.tooltip.transition()
+							.duration(500)
+							.style("opacity", 0)
+
+						this.hoveredState = null
+					}).on("mousedown", (d) => {
+						this.selectState(d.properties.name)
+					})
+
+				if (this.hoveredState) {
+					let datum = data[this.hoveredState.properties.name]
 					let value = datum ? datum[0] : 0
 					let population = datum ? datum[1] : 1
 
@@ -227,56 +266,23 @@ export default class MapGraph extends React.Component {
 						oneInHowMany = `<br />1 in every ${Math.floor(population / value).toLocaleString()} residents`
 					}
 
-					this.tooltip.transition()
-						.duration(200)
-						.style("opacity", .9)
-
-					this.tooltip.html(`${d.properties.name}<br />${value.toLocaleString()} ${this.state.selectedType.toLowerCase()}${oneInHowMany}`)
-						.style("left", (d3.event.pageX) + "px")
-						.style("top", (d3.event.pageY - 28) + "px")
-
-					this.hoveredState = d
-				}).on("mousemove", (d) => {
-					this.tooltip.style("left", (d3.event.pageX) + "px")
-						.style("top", (d3.event.pageY - 28) + "px")
-
-					this.hoveredState = d
-				}).on("mouseout", (d) => {
-					this.tooltip.transition()
-						.duration(500)
-						.style("opacity", 0)
-
-					this.hoveredState = null
-				}).on("mousedown", (d) => {
-					this.selectState(d.properties.name)
-
-					this.nodes.sort((a, b) => {
-						return a.properties.name != d.properties.name ? -1 : 1
-					})
-				})
-
-			if (this.hoveredState) {
-				let datum = data[this.hoveredState.properties.name]
-				let value = datum ? datum[0] : 0
-				let population = datum ? datum[1] : 1
-
-				let oneInHowMany = ""
-				if (value > 0) {
-					oneInHowMany = `<br />1 in every ${Math.floor(population / value).toLocaleString()} residents`
+					this.tooltip.html(`${this.hoveredState.properties.name}<br />${value.toLocaleString()} ${this.state.selectedType.toLowerCase()}${oneInHowMany}`)
 				}
 
-				this.tooltip.html(`${this.hoveredState.properties.name}<br />${value.toLocaleString()} ${this.state.selectedType.toLowerCase()}${oneInHowMany}`)
-			}
-
-			this.playResolve()
-			this.playResolve = () => { }
+				this.playResolve()
+				this.playResolve = () => { }
+				resolve()
+			})
 		})
 	}
 
 	componentDidMount() {
 		this.setupGraph().then(() => {
-			this.renderGraph()
+			this.renderGraph().then(() => {
+				this.selectState("Arizona")
+			})
 			this.getNational()
+			this.getState()
 		})
 	}
 
@@ -295,13 +301,21 @@ export default class MapGraph extends React.Component {
 
 		// we need to update the national stats since they are reliant on date
 		this.getNational()
+		this.getState()
 	}
 
 	getNational() {
-		// we need to update the national stats since they are reliant on date
 		requestBackend(`/national/${this.state.selectedDate}`).then((json) => {
 			this.setState({
 				nationalStats: json,
+			})
+		})
+	}
+	
+	getState() {
+		requestBackend(`/state/${this.state.selectedUSState}/${this.state.selectedDate}`).then((json) => {
+			this.setState({
+				usStateStats: json,
 			})
 		})
 	}
@@ -623,9 +637,9 @@ export default class MapGraph extends React.Component {
 					<Row gutter={16}>
 						<Col span={12}>
 							<Card title={`${this.state.selectedUSState} Status Breakdown`} bordered={true} >
-								<div className="label">State Population: </div>
-								<div className="label">Deaths: </div>
-								<div className="label">Cases: </div>
+							<div className="data-label">{this.state.usStateStats.population || 0} residents</div>
+								<div className="data-label">{this.state.usStateStats.deaths || 0} deaths</div>
+								<div className="data-label">{this.state.usStateStats.cases || 0} cases</div>
 							</Card>
 						</Col>
 

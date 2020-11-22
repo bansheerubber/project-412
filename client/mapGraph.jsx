@@ -622,11 +622,11 @@ export default class MapGraph extends React.Component {
 									<div className="label">Cases: </div>
 									<div className="label">Deaths: </div>
 								</Col>
-							<Row gutter={16}>
+							<Row gutter={64}>
 								<Col span={12}>
 									<Table size={"small"} columns={countyColumns}/>
 								</Col>
-								<Col span={14}>
+								<Col span={12}>
 									<Table size={"small"} columns={countyColumns}/>
 								</Col>
 							</Row>
@@ -634,6 +634,9 @@ export default class MapGraph extends React.Component {
 						</Card>
 						</Col>
 					</Row>
+
+					<Divider orientation="left"></Divider>
+
 					<Row gutter={16}>
 						<Col span={12}>
 							<Card title={`${this.state.selectedUSState} Status Breakdown`} bordered={true} >
@@ -645,7 +648,23 @@ export default class MapGraph extends React.Component {
 
 						<Col span={12}>
 							<Card title={`${this.state.selectedUSState} Mask Use Breakdown`} bordered={true}>
-								<div className="label">Percentage of People who Regularly Wear Masks:  </div>
+								<Table size={"small"} columns={countyColumns}/>
+							</Card>
+						</Col>
+					</Row>
+
+					<Divider orientation="left"></Divider>
+
+					<Row gutter={16}>
+						<Col span={12}>
+							<Card title={`Total Business Closures in ${this.state.selectedUSState}`} bordered={true}>
+								<div className="data-label">{this.state.nationalStats.closedBusinesses || 0} business closures</div>
+							</Card>
+						</Col>
+						<Col span={12}>
+							<Card title={"Governor Information"}>
+								<div className="data-label">{`${this.state.selectedUSState} Governor: `} </div>
+								<div className="data-label">{"Mask Mandate in Place? "} </div>
 							</Card>
 						</Col>
 					</Row>

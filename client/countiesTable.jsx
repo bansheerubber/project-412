@@ -91,6 +91,7 @@ export default class CountiesTable extends React.Component {
 		
 		return (
 			<Table
+				pagination={{showSizeChanger: false}}
 				size={"middle"}
 				columns={[{
 					title: "County",

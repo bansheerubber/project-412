@@ -208,14 +208,15 @@ export default class MapGraph extends React.Component {
 		let maxDate = new Date(2020, 1, 21)
 		maxDate.setDate(maxDate.getDate() + 230)
 
+		this.rangeDateSet = false
+
 		if(this.state.sliderValue >= 230) {
 			this.stopMap()
 		}
 		else {
 			this.lastQuery = performance.now()
 			
-			date.setDate(date.getDate() + this.state.sliderValue)
-			this.rangeDateSet = false
+			date.setDate(date.getDate() + this.state.sliderValue + 1)
 			this.setState({
 				sliderValue: this.state.sliderValue + 1,
 				selectedDate: date.toISOString().slice(0, 19).split("T")[0],

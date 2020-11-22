@@ -308,8 +308,8 @@ def national(date):
 		[date]
 	)
 	data = cursor.fetchone()
-	big["deaths"] = "{:,}".format(int(data[0]))
-	big["cases"] = "{:,}".format(int(data[1]))
+	big["deaths"] = "{:,}".format(0 if not data[0] else int(data[0]))
+	big["cases"] = "{:,}".format(0 if not data[1] else int(data[1]))
 
 	return json.dumps(big)
 

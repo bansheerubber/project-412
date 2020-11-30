@@ -191,7 +191,7 @@ export default class MapGraph extends React.Component {
 		})
 
 		// query counties list
-		requestBackend(`/counties-list/${name}`).then((json) => {
+		requestBackend(`./counties-list/${name}`).then((json) => {
 			this.setState({
 				countyList: json,
 			})
@@ -309,7 +309,7 @@ export default class MapGraph extends React.Component {
 			this.lastCounty1 = this.state.county1
 
 			if(this.state.county1) {
-				requestBackend(`/county-compare/${this.state.selectedUSState}/${this.state.county1.trim()}/${this.state.selectedDate}`).then((json) => {
+				requestBackend(`./county-compare/${this.state.selectedUSState}/${this.state.county1.trim()}/${this.state.selectedDate}`).then((json) => {
 					this.setState({
 						county1Stats: json,
 					})
@@ -326,7 +326,7 @@ export default class MapGraph extends React.Component {
 			this.lastCounty2 = this.state.county2
 
 			if(this.state.county2) {
-				requestBackend(`/county-compare/${this.state.selectedUSState}/${this.state.county2.trim()}/${this.state.selectedDate}`).then((json) => {
+				requestBackend(`./county-compare/${this.state.selectedUSState}/${this.state.county2.trim()}/${this.state.selectedDate}`).then((json) => {
 					this.setState({
 						county2Stats: json,
 					})
@@ -341,7 +341,7 @@ export default class MapGraph extends React.Component {
 	}
 
 	getNational() {
-		requestBackend(`/national/${this.state.selectedDate}`).then((json) => {
+		requestBackend(`./national/${this.state.selectedDate}`).then((json) => {
 			this.setState({
 				nationalStats: json,
 			})
@@ -349,7 +349,7 @@ export default class MapGraph extends React.Component {
 	}
 
 	getState() {
-		requestBackend(`/state/${this.state.selectedUSState}/${this.state.selectedDate}`).then((json) => {
+		requestBackend(`./state/${this.state.selectedUSState}/${this.state.selectedDate}`).then((json) => {
 			this.setState({
 				usStateStats: json,
 			})

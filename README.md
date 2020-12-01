@@ -21,6 +21,10 @@ You can preview the website by going to `http://localhost:5000/` in your browser
 
 https://docs.google.com/document/d/1ZLU0SaxMXCm5qQB1TP3aXTl1QZrC5OytoOM6HlIdH-I/edit?usp=sharing
 
+# 5 Minute Video Demonstration Link
+
+https://youtu.be/cI1lSBN8Tn4
+
 # Member Contribution
 
 Justin Colyar - Responsible for work on the backend/database including database design, population, SQL queries for APIs, and documentation for User Guide. 

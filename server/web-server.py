@@ -331,8 +331,7 @@ def national(date):
 		"""SELECT SUM(Deaths), SUM(Cases) FROM Status s
 		JOIN State st ON s.Place_id = st.Place_id
 		JOIN Governor g ON g.State_id = st.State_id
-		WHERE g.Pro_Mask = False
-		AND Date = %s;""",
+		WHERE Date = %s;""",
 		[date]
 	)
 	data = cursor.fetchone()
